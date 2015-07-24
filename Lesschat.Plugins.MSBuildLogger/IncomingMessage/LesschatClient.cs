@@ -9,7 +9,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace msbuild_lesschat
+namespace Lesschat.Plugins.MSBuildLogger.IncomingMessage
 {
     public class LesschatClient
     {

@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace msbuild_lesschat
+namespace Lesschat.Plugins.MSBuildLogger.IncomingMessage
 {
     public class LesschatIncomingMessageResponse
     {

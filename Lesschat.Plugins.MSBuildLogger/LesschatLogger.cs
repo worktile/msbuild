@@ -1,22 +1,18 @@
-﻿using Microsoft.Build.Framework;
+﻿using Lesschat.Plugins.MSBuildLogger.IncomingMessage;
+using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace msbuild_lesschat
+namespace Lesschat.Plugins.MSBuildLogger
 {
     public class LesschatLogger : Logger
     {
-        private readonly StringBuilder _sb;
-        private int _indent;
         private LesschatClient _client;
-        private readonly IList<Task<LesschatIncomingMessageResponse>> _tasks;
 
         private readonly Stopwatch _stopwatch;
         private int _warnings;
@@ -24,10 +20,7 @@ namespace msbuild_lesschat
 
         public LesschatLogger() : base()
         {
-            _sb = new StringBuilder();
-            _indent = 0;
             _client = null;
-            _tasks = new List<Task<LesschatIncomingMessageResponse>>();
 
             _stopwatch = new Stopwatch();
             _warnings = 0;
@@ -78,8 +71,6 @@ namespace msbuild_lesschat
                             Text = string.Format("{0} @{1}", e.Message, e.Timestamp.ToString())
                         }
                     });
-                    Console.WriteLine("BuildStarted");
-                    Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
                 }
             };
 
@@ -108,8 +99,6 @@ namespace msbuild_lesschat
                     message.Attachment.Fields.Add(new LesschatIncomingMessage.LesschatIncomingMessageAttachmentField("Time Elapsed", _stopwatch.Elapsed.ToString(), true));
 
                     var response = _client.Send(message);
-                    Console.WriteLine("BuildFinished");
-                    Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
                 }
             };
 
@@ -126,8 +115,6 @@ namespace msbuild_lesschat
                             Text = e.Message
                         }
                     });
-                    Console.WriteLine("ProjectStarted");
-                    Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
                 }
             };
 
@@ -144,8 +131,6 @@ namespace msbuild_lesschat
                             Text = e.Message
                         }
                     });
-                    Console.WriteLine("ProjectFinished");
-                    Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
                 }
             };
 
@@ -177,13 +162,11 @@ namespace msbuild_lesschat
                     message.Attachment.Color = LesschatIncomingMessage.LesschatIncomingMessageAttachmentColors.Error;
                     if (!string.IsNullOrWhiteSpace(e.File) && e.LineNumber > 0 && e.ColumnNumber > 0 && !string.IsNullOrWhiteSpace(e.Code))
                     {
-                        message.Attachment.Fields.Add(new LesschatIncomingMessage.LesschatIncomingMessageAttachmentField("File", e.File, false));
-                        message.Attachment.Fields.Add(new LesschatIncomingMessage.LesschatIncomingMessageAttachmentField("Location", string.Format("Ln {0}, Col {1}", e.LineNumber, e.ColumnNumber), false));
+                        message.Attachment.Fields.Add(new LesschatIncomingMessage.LesschatIncomingMessageAttachmentField("File", e.File, true));
+                        message.Attachment.Fields.Add(new LesschatIncomingMessage.LesschatIncomingMessageAttachmentField("Location", string.Format("Ln {0}, Col {1}", e.LineNumber, e.ColumnNumber), true));
                     }
 
                     var response = _client.Send(message);
-                    Console.WriteLine("ErrorRaised");
-                    Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
                 }
             };
 
@@ -199,13 +182,11 @@ namespace msbuild_lesschat
                     message.Attachment.Color = LesschatIncomingMessage.LesschatIncomingMessageAttachmentColors.Warning;
                     if (!string.IsNullOrWhiteSpace(e.File) && e.LineNumber > 0 && e.ColumnNumber > 0 && !string.IsNullOrWhiteSpace(e.Code))
                     {
-                        message.Attachment.Fields.Add(new LesschatIncomingMessage.LesschatIncomingMessageAttachmentField("File", e.File, false));
-                        message.Attachment.Fields.Add(new LesschatIncomingMessage.LesschatIncomingMessageAttachmentField("Location", string.Format("Ln {0}, Col {1}", e.LineNumber, e.ColumnNumber), false));
+                        message.Attachment.Fields.Add(new LesschatIncomingMessage.LesschatIncomingMessageAttachmentField("File", e.File, true));
+                        message.Attachment.Fields.Add(new LesschatIncomingMessage.LesschatIncomingMessageAttachmentField("Location", string.Format("Ln {0}, Col {1}", e.LineNumber, e.ColumnNumber), true));
                     }
 
                     var response = _client.Send(message);
-                    Console.WriteLine("WarningRaised");
-                    Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
                 }
             };
 
@@ -221,47 +202,17 @@ namespace msbuild_lesschat
                     message.Attachment.Color = LesschatIncomingMessage.LesschatIncomingMessageAttachmentColors.Message;
                     if (!string.IsNullOrWhiteSpace(e.File) && e.LineNumber > 0 && e.ColumnNumber > 0 && !string.IsNullOrWhiteSpace(e.Code))
                     {
-                        message.Attachment.Fields.Add(new LesschatIncomingMessage.LesschatIncomingMessageAttachmentField("File", e.File, false));
-                        message.Attachment.Fields.Add(new LesschatIncomingMessage.LesschatIncomingMessageAttachmentField("Location", string.Format("Ln {0}, Col {1}", e.LineNumber, e.ColumnNumber), false));
+                        message.Attachment.Fields.Add(new LesschatIncomingMessage.LesschatIncomingMessageAttachmentField("File", e.File, true));
+                        message.Attachment.Fields.Add(new LesschatIncomingMessage.LesschatIncomingMessageAttachmentField("Location", string.Format("Ln {0}, Col {1}", e.LineNumber, e.ColumnNumber), true));
                     }
 
                     var response = _client.Send(message);
-                    Console.WriteLine("MessageRaised");
-                    Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
                 }
             };
         }
 
-        private string GenerateMessage(string line, BuildEventArgs e, string category)
-        {
-            var title = string.Compare(e.SenderName, "MSBuild", true) == 0 ? line : string.Format("{0}: {1}", e.SenderName, line);
-            var result = string.Empty;
-            for (int i = _indent; i > 0; i--)
-            {
-                result += "    ";
-            }
-            result += category + " > ";
-            result += title;
-            result += e.Message;
-            return result;
-        }
-
-        private void OutputMessages(string message)
-        {
-            Console.WriteLine(message);
-
-            //var response = _client.SendAsync(message).Result;
-            //Console.WriteLine(JsonConvert.SerializeObject(response, Formatting.Indented));
-        }
-
         public override void Shutdown()
         {
-            //OutputMessages(_sb.ToString());
-
-            
-
-            //System.Threading.Tasks.Task.WhenAll(_tasks).Wait();
-
             base.Shutdown();
         }
     }
