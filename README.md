@@ -9,7 +9,9 @@
 
 找到`.output`目录，复制里面所有的文件到你方便调用的地方。比如`D:\tools\msbuild-lesschat`。
 
-使用MSBuild编译你的代码时，加入`/logger`开关并指定使用`Lesschat.Plugins.MSBuildLogger.dll`以及你Lesschat里面Incoming Message的地址。比如这段命令`msbuild Poda.csproj /nologo /noconsolelogger /logger:D:\tools\msbuild-lesschat\Lesschat.Plugins.MSBuildLogger.dll;adce412979234872b56a5cf87895dcbe /v:m /t:rebui`。其中'/logger`开关后面紧跟`msbuild-lesschat`文件所在位置，分号后面是要输出的Lesschar Incoming Message ID。
+使用MSBuild编译你的代码时，加入`/logger`开关并指定使用`Lesschat.Plugins.MSBuildLogger.dll`以及你Lesschat里面Incoming Message的地址。比如这段命令
+```msbuild Poda.csproj /nologo /noconsolelogger /logger:D:\tools\msbuild-lesschat\Lesschat.Plugins.MSBuildLogger.dll;adce412979234872b56a5cf87895dcbe /v:m /t:rebui```
+其中`/logger`开关后面紧跟`msbuild-lesschat`文件所在位置，分号后面是要输出的Lesschar Incoming Message ID。
 > 在使用之前你还需要在Lesschat里面创建一个Incoming Message服务。创建之后的URL就是这里你需要填写的地址了。关于如何在Lesschat里面创建Incoming Message服务，请参考[这里](https://shaunxu.lesschat.com/help/services)。我知道他们的帮助写的很不完善，不过我相信你可以自己创建一个试试，马上就会明白的。
 
 执行上述命令，保证你的Lesschat已经打开并且在你已经绑定的频道，那么你就会看到如上面截图类似的实时消息了。
