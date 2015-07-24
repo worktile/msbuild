@@ -1,4 +1,4 @@
-想把MSBuild编译和构建的所有消息通过[Lesschat](https://www.lesschat.com)实事推送到你眼前？找对地方了 :stuck_out_tongue_closed_eyes:
+想把MSBuild编译和构建的所有消息通过[Lesschat](https://www.lesschat.com)实时推送到你眼前？找对地方了 :stuck_out_tongue_closed_eyes:
 
 # MSBuild Plugin for Lesschat
 ![screenshot](https://raw.githubusercontent.com/lesschat/msbuild/master/.images/2015-07-24_13-04-27.png)
@@ -31,4 +31,4 @@
 源代码都在这里，很简单，你完全可以自己修改一些代码来达到所需的要求。
 
 # 有Bug了！
-我推荐你在这里提Issue。我确信Github会通过邮件通知我并且我会尽量第一时间回复。如果实在找不到我，可以试着自己改改并且发Pull Request。
+我推荐你在这里提Issue。我确信Github会通过邮件通知我并且我会尽量第一时间回复。如果实在找不到我，可以试着自己改并且发Pull Request。
